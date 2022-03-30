@@ -22,15 +22,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
-    # Runs a single command using the runners shell
       - name: install dependencies
         run: npm install--global newman newman-reporter-htmlextra
 
- 
       - name: postman test
         run: newman run collection.json -r cli.junit.htmlextra
         
@@ -41,7 +38,7 @@ jobs:
           name: API tests 
           path: newman/*.xml
           reporter: java-junit
-      
+          
       - name: Publier le rapport html
         uses: actions/upload-artifact@v3
         if: always()
