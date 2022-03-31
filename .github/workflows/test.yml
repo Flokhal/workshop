@@ -29,7 +29,7 @@ jobs:
         run: npm install --global newman newman-reporter-htmlextra
 
       - name: postman test
-        run: newman run "Projet 1 - Test Github API with Postman.postman_collection.json" -r cli,junit,htmlextra
+        run: newman run https://www.getpostman.com/collections/261ef23ff577060af175 -r cli,junit,htmlextra
         
       - name: publish JUnit reports
         uses: dorny/test-reporter@v1
