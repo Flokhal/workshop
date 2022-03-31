@@ -26,10 +26,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: install dependencies
-        run: npm install--global newman newman-reporter-htmlextra
+        run: npm install --global newman newman-reporter-htmlextra
 
       - name: postman test
-        run: newman run collection.json -r cli.junit.htmlextra
+        run: newman run collection.json -r cli,junit,htmlextra
         
       - name: publish JUnit reports
         uses: dorny/test-reporter@v1
