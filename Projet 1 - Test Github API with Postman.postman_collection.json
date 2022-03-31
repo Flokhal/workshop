@@ -1,0 +1,589 @@
+{
+	"info": {
+		"_postman_id": "4cebcd5b-cd73-45e7-961e-24c0a9905e7d",
+		"name": "Projet 1 - Test Github API with Postman",
+		"description": "# Documentation Projet 1\n\nThe purpose of project 1 is to test the **creation (POST)**, the **update (PATCH)** then the **deletion** **(DELETE)** of a github repository.\n\nFinally, all tests are **automated** with the Postman Runner.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create a repository",
+			"item": [
+				{
+					"name": "Create a repository with empty body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check message response 'Body should be a JSON object'\", () => {\r",
+									"    pm.expect(pm.response.json().message).to.eql('Body should be a JSON object')\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/user/repos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"repos"
+							]
+						},
+						"description": "**GIVEN** a logged user  \n**WHEN** I create a repository with an empty body  \n**THEN** the repository should not be created\n\n**AND** I should receive an error 400"
+					},
+					"response": []
+				},
+				{
+					"name": "Create a repository with missing required field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 422\", function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response Error Code is 'missing_field'\", () => {\r",
+									"    pm.expect(pm.response.json().errors[0].code).to.eql(\"missing_field\");\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"{{description}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/repos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"repos"
+							]
+						},
+						"description": "**GIVEN** a logged user  \n**WHEN** I create a repository with a missing field  \n**THEN** I should receive an error 422"
+					},
+					"response": []
+				},
+				{
+					"name": "Create a repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Check if code is 201\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(201)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Verify the repository name\", () => {\r",
+									"    pm.expect(pm.response.json().name).to.eql(pm.collectionVariables.get(\"name\"))\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Check if response is an object\", () => {\r",
+									"    pm.expect(pm.response).is.a(\"object\");\r",
+									"})\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('name', pm.variables.replaceIn('{{$randomNoun}}'));\r",
+									"pm.collectionVariables.set('description', pm.variables.replaceIn('{{$randomPhrase}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"description\": \"{{description}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/repos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"repos"
+							]
+						},
+						"description": "**GIVEN** a logged user  \n**WHEN** I create a repository  \n**THEN** I should receive a status 200\n**AND a** new repository is created"
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a wrong repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check if response message is 'Not Found'\", () => {\r",
+									"    pm.expect(pm.response.json().message).to.eql(\"Not Found\")\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/awrongrepository1234",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"awrongrepository1234"
+							]
+						},
+						"description": "**GIVEN** a logged user  \n**WHEN** I search a wrong repository  \n**THEN** I should receive an error 404"
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve an existing repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200 and repo name is right\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.expect(pm.response.json().name).to.eql(pm.collectionVariables.get(\"name\"))\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Repo name is right\", function () {\r",
+									"    pm.expect(pm.response.json().name).to.eql(pm.collectionVariables.get(\"name\"))\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/{{name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"{{name}}"
+							]
+						},
+						"description": "**GIVEN** a logged user  \n**WHEN** I search an existing repository  \n**THEN** I should receive a status 200\n**AND** the repo is retrieved"
+					},
+					"response": []
+				}
+			],
+			"description": "All requests to test the creation of a Github repository"
+		},
+		{
+			"name": "Update Repository",
+			"item": [
+				{
+					"name": "Update an inexisting repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status code is 404\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Check response message is 'Not Found'\", () => {\r",
+									"    pm.expect(pm.response.json().message).to.be.eql(\"Not Found\");\r",
+									"})\r",
+									" \r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"new-name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/inexistingrepository1234",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"inexistingrepository1234"
+							]
+						},
+						"description": "**GIVEN** an authenticated user\n**WHEN** he sends a patch request to update an inexisting repository\n**THEN** the server returns an error 404\n**AND** the server returns the error message 'Not Found'"
+					},
+					"response": []
+				},
+				{
+					"name": "Update repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseJson = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Verify code 200\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(200);\r",
+									"    pm.collectionVariables.set(\"name\", responseJson.name);\r",
+									"    pm.collectionVariables.set(\"description\", responseJson.description);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"repository name is updated\", () => {\r",
+									"    let newName = pm.collectionVariables.get(\"name\");\r",
+									"    pm.expect(responseJson.name).to.eql(newName);\r",
+									"});\r",
+									"    \r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('updatedName', pm.variables.replaceIn('{{$randomNoun}}'));\r",
+									"pm.collectionVariables.set('updatedDescription', pm.variables.replaceIn('{{$randomPhrase}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{updatedName}}\",\r\n    \"description\": \"{{updatedDescription}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/{{name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"{{name}}"
+							]
+						},
+						"description": "**GIVEN** an authenticated user  \n**AND** he fills the body to update the repository name of an existing repository  \n**WHEN** he sends the Patch request  \n**THEN** the server return code 200\n**AND** the new name is displayed in the json response"
+					},
+					"response": []
+				}
+			],
+			"description": "All requests to test a repository update."
+		},
+		{
+			"name": "Delete Repositories",
+			"item": [
+				{
+					"name": "Delete an existing repository",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/{{name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"{{name}}"
+							]
+						},
+						"description": "**GIVEN** an authenticated user  \n**WHEN** he sends a delete request to delete an existing repository  \n**THEN** the server returns a code 204"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a wrong repository",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status Code is 404\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.eql(404)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Check response message is 'Not Found'\", () => {\r",
+									"    pm.expect(pm.response.json().message).to.be.eql(\"Not Found\");\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/wrongrepository1234",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"wrongrepository1234"
+							]
+						},
+						"description": "**GIVEN** an authenticated user  \n**WHEN** he sends the delete request to delete an inexisting repository  \n**THEN** the server returns code 404  \n**AND** the server return the error message 'Not Found'"
+					},
+					"response": []
+				},
+				{
+					"name": "retrieve all repositories to check if repo is deleted",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseJson = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Test if deleted repository is not in list\", () => {\r",
+									"    responseJson.map(item => {\r",
+									"        pm.expect(item.name).to.not.equal(pm.collectionVariables.get(\"name\"));\r",
+									"    })       \r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/user/repos",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"repos"
+							]
+						},
+						"description": "**GIVEN** an authentificated user\n**WHEN** I deleted an existing repository\n**AND** I check the list of my repositories\n**THEN** I should not find it within the list of my repositories"
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve deleted repository returns 404",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/repos/{{githubUsername}}/{{name}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"repos",
+								"{{githubUsername}}",
+								"{{name}}"
+							]
+						},
+						"description": "**GIVEN** an authentificated user\n**WHEN** I deleted an existing repository\n**AND** I try to access it\n**THEN** I should not be able to access it\n**AND** I should receive an error 404"
+					},
+					"response": []
+				}
+			],
+			"description": "All requests to test deleting repository."
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "https://api.github.com"
+		},
+		{
+			"key": "githubUsername",
+			"value": "wcs-groupe",
+			"type": "string"
+		},
+		{
+			"key": "description",
+			"value": "This is  the description of the project",
+			"type": "string"
+		},
+		{
+			"key": "name",
+			"value": ""
+		},
+		{
+			"key": "updatedDescription",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "updatedName",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
